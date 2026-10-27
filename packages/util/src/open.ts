@@ -23,7 +23,8 @@ export function openHref(input: string, base?: string) {
 /** @internal */
 export function resolveOpenTarget(input: string, base?: string) {
   // Absolute paths before URL parsing: URL.canParse treats "C:\..." / "C:/..." as scheme "c:".
-  if (path.isAbsolute(input) || /^[A-Za-z]:[\\/]/.test(input)) return input
+  // Markdown absolute hrefs still use URI spelling (%20, #fragment), same as relatives.
+  if (path.isAbsolute(input) || /^[A-Za-z]:[\\/]/.test(input)) return decodeHrefPath(input)
   if (URL.canParse(input)) {
     const url = new URL(input)
     if (url.protocol === "http:" || url.protocol === "https:") return url.href

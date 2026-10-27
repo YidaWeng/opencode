@@ -29,10 +29,20 @@ describe("resolveOpenTarget", () => {
     expect(resolveOpenTarget(file)).toBe(file)
   })
 
+  test("decodes percent-escaped absolute hrefs and drops fragments", () => {
+    expect(resolveOpenTarget("/tmp/mobile%20menu.png")).toBe("/tmp/mobile menu.png")
+    expect(resolveOpenTarget("/tmp/mobile%20menu.png#preview")).toBe("/tmp/mobile menu.png")
+    expect(resolveOpenTarget("/tmp/plan.md#section")).toBe("/tmp/plan.md")
+    // Literal % / # in filenames stay reachable through their encoded forms.
+    expect(resolveOpenTarget("/tmp/foo%2520bar.md")).toBe("/tmp/foo%20bar.md")
+    expect(resolveOpenTarget("/tmp/foo%23bar.md")).toBe("/tmp/foo#bar.md")
+  })
+
   test("keeps Windows drive-qualified paths in either slash style", () => {
     expect(resolveOpenTarget("C:\\Users\\foo\\file.md")).toBe("C:\\Users\\foo\\file.md")
     expect(resolveOpenTarget("C:/Users/foo/file.md")).toBe("C:/Users/foo/file.md")
     expect(resolveOpenTarget("d:\\repo\\plan.md")).toBe("d:\\repo\\plan.md")
+    expect(resolveOpenTarget("C:/Users/foo/mobile%20menu.png#preview")).toBe("C:/Users/foo/mobile menu.png")
   })
 
   test("resolves relative paths against a session directory base", () => {
